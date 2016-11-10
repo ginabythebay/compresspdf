@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "ynJSWoF6v+3zMnh9R0QmmG6iGV8=",
+			"path": "github.com/pkg/errors",
+			"revision": "248dadf4e9068a0b3e79f02ed0a610d935de5302",
+			"revisionTime": "2016-10-29T09:36:37Z"
+		},
+		{
+			"checksumSHA1": "ToTZYDqlvtuFsetAq5FeCwUxp0E=",
+			"path": "github.com/urfave/cli",
+			"revision": "d86a009f5e13f83df65d0d6cee9a2e3f1445f0da",
+			"revisionTime": "2016-11-02T13:18:01Z"
+		}
+	],
+	"rootPath": "github.com/ginabythebay/compresspdf"
+}
