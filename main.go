@@ -214,7 +214,7 @@ func (c *compressor) compress(target string) (bool, error) {
 	if err != nil {
 		return false, errors.Wrapf(err, "Rename from %q to %q", tmpfile, target)
 	}
-	c.verbose("Shrank %q from %s by %s", humanize(oldFile.Size()), humanize(-growth))
+	c.verbose("Shrank %q from %s by %s", target, humanize(oldFile.Size()), humanize(-growth))
 
 	return true, nil
 }
