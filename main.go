@@ -214,7 +214,8 @@ func (c *compressor) compress(target string) (bool, error) {
 	if err != nil {
 		return false, errors.Wrapf(err, "Rename from %q to %q", tmpfile, target)
 	}
-	c.verbose("Shrank %q from %s by %s", target, humanize(oldFile.Size()), humanize(-growth))
+	pct := percent(oldFile.Size(), newFile.Size())
+	c.verbose("Shrank %q to %s, (%%%s of its original size)", target, humanize(newFile.Size()), pct)
 
 	return true, nil
 }
@@ -247,6 +248,11 @@ var suffixes = []string{
 	"K",
 	"M",
 	"G",
+}
+
+func percent(old, new int64) string {
+	f := 100.0 * float64(new) / float64(old)
+	return fmt.Sprintf("%.2f", f)
 }
 
 func humanize(i int64) string {
