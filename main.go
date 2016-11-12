@@ -252,17 +252,25 @@ var suffixes = []string{
 
 func percent(old, new int64) string {
 	f := 100.0 * float64(new) / float64(old)
-	return fmt.Sprintf("%.2f", f)
+	switch {
+	case f < 1:
+		return fmt.Sprintf("%.2f", f)
+	case f < 10:
+		return fmt.Sprintf("%.1f", f)
+	default:
+		return fmt.Sprintf("%.0f", f)
+	}
 }
 
 func humanize(i int64) string {
+	f := float64(i)
 	s := suffixes[len(suffixes)-1]
 	for _, candidate := range suffixes {
-		if i < 1024 {
+		if f < 1024 {
 			s = candidate
 			break
 		}
-		i = i / 1024
+		f = f / 1024
 	}
-	return fmt.Sprintf("%d%s", i, s)
+	return fmt.Sprintf("%.1f%s", f, s)
 }
