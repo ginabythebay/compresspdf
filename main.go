@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -19,6 +18,7 @@ import (
 var (
 	gs      = mustLocate("gs")
 	pdfinfo = mustLocate("pdfinfo")
+	mv      = mustLocate("mv")
 )
 
 func mustLocate(pgm string) string {
@@ -68,12 +68,12 @@ func compressAll(c *cli.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	// defer func() {
-	// 	rmvErr := os.RemoveAll(workDir)
-	// 	if rmvErr != nil && err == nil {
-	// 		err = rmvErr
-	// 	}
-	// }()
+	defer func() {
+		rmvErr := os.RemoveAll(workDir)
+		if rmvErr != nil && err == nil {
+			err = rmvErr
+		}
+	}()
 
 	comp := compressor{
 		c.Bool("force"),
@@ -210,8 +210,9 @@ func (c *compressor) compress(target string) (bool, error) {
 		return false, nil
 	}
 
-	err = copyFile(tmpfile, target)
+	err = mvFile(tmpfile, target)
 	if err != nil {
+		_ = os.Remove(tmpfile)
 		return false, errors.Wrapf(err, "Rename from %q to %q", tmpfile, target)
 	}
 	pct := percent(oldFile.Size(), newFile.Size())
@@ -220,27 +221,13 @@ func (c *compressor) compress(target string) (bool, error) {
 	return true, nil
 }
 
-func copyFile(src, dst string) (err error) {
-	in, err := os.Open(src)
+func mvFile(src, dst string) (err error) {
+	cmd := exec.Command(mv, src, dst)
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return
+		return errors.Wrapf(err, "running %q returned %q", cmd.Args, string(out))
 	}
-	defer in.Close()
-	out, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer func() {
-		cerr := out.Close()
-		if err == nil {
-			err = cerr
-		}
-	}()
-	if _, err = io.Copy(out, in); err != nil {
-		return
-	}
-	err = out.Sync()
-	return
+	return nil
 }
 
 var suffixes = []string{
